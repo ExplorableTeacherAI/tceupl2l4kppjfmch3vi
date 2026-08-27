@@ -410,9 +410,33 @@ export const complexPolarBlocks: ReactElement[] = [
                     correctValue="6"
                     position="terminal"
                     successMessage="— yes, 3 × 2, because w stretches z by its own length"
-                    failureMessage="— 5 would be the answer if lengths added, but watch the stretch on the track."
-                    hint="w acts as a scale factor of 2 on the length of z"
+                    failureMessage="— 5 would be the answer if lengths added. Click the box and try again as often as you need."
+                    hint="Watch the lower track: w acts as a scale factor on the length of z"
                     reviewBlockId="polar-tracks-figure"
+                    visualizationHint={{
+                        blockId: "polar-tracks-figure",
+                        hintKey: "polar-length-hint",
+                        label: "Try it in the figure",
+                        resetVars: { polarZRadius: 1.5, polarZAngle: 30, polarWRadius: 0.6, polarWAngle: 45 },
+                        steps: [
+                            {
+                                gesture: "drag-horizontal",
+                                label: "Drag the indigo marker on the lower track until w reaches 2 — the product is twice z",
+                                position: { x: "35%", y: "69%" },
+                                completionVar: "polarWRadius",
+                                completionValue: 2,
+                                completionTolerance: 0.15,
+                            },
+                            {
+                                gesture: "drag-horizontal",
+                                label: "Now bring w back to 1: the product falls back to z's own length, which adding could never do",
+                                position: { x: "55%", y: "69%" },
+                                completionVar: "polarWRadius",
+                                completionValue: 1,
+                                completionTolerance: 0.15,
+                            },
+                        ],
+                    }}
                 >
                     <InlineClozeInput
                         varName="answer_polar_modulus"
@@ -433,7 +457,7 @@ export const complexPolarBlocks: ReactElement[] = [
                     correctValue={["65", "65°"]}
                     position="terminal"
                     successMessage="— exactly, 40° then a further 25°, one turn continuing where the other finished"
-                    failureMessage="— multiplying the angles gives 1000°, which would spin the product several times round; angles do not multiply."
+                    failureMessage="— multiplying the angles gives 1000°, which would spin the product several times round; angles do not multiply. Click the box and try again."
                     hint="The second angle starts from wherever the first one ended"
                     reviewBlockId="polar-tracks-figure"
                     visualizationHint={{

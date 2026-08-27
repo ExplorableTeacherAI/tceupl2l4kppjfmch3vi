@@ -334,7 +334,7 @@ export const complexTimesIBlocks: ReactElement[] = [
                     correctValue="exactly the same"
                     position="terminal"
                     successMessage="— yes, and that is the whole point: i is a pure turn, so nothing about the size changes"
-                    failureMessage="— that is the usual expectation, but the two distance readouts never disagree."
+                    failureMessage="— that is the usual expectation, but the two distance readouts never disagree. Pick again whenever you are ready."
                     hint="Multiplying by i is a rotation, and rotations do not resize anything"
                     reviewBlockId="times-i-figure"
                     visualizationHint={{
@@ -383,9 +383,33 @@ export const complexTimesIBlocks: ReactElement[] = [
                     correctValue={["-2", "−2", "-2+0i", "-2 + 0i"]}
                     position="terminal"
                     successMessage="— exactly, two quarter turns is a half turn, so the point crosses to the far side of the origin, still 2 units out"
-                    failureMessage="— close, but check where a second quarter turn takes you."
-                    hint="Starting straight up and turning another 90° anticlockwise puts you on the negative real axis, and the distance is still 2"
+                    failureMessage="— not yet. Click the box and try again as often as you like."
+                    hint="Put the point at 2i in the figure above and turn it once more; the distance stays 2, so only the direction can change"
                     reviewBlockId="times-i-figure"
+                    visualizationHint={{
+                        blockId: "times-i-figure",
+                        hintKey: "times-i-double-turn-hint",
+                        label: "Try it in the figure",
+                        resetVars: { iTurnReal: 2.8, iTurnImag: 1, iTurnRevealed: true },
+                        steps: [
+                            {
+                                gesture: "drag",
+                                label: "Drag the teal point z left onto the imaginary axis",
+                                position: { x: "73%", y: "39%" },
+                                completionVar: "iTurnReal",
+                                completionValue: 0,
+                                completionTolerance: 0.3,
+                            },
+                            {
+                                gesture: "drag-vertical",
+                                label: "Slide it to 2 units up, so z is 2i — now read where i·z sits",
+                                position: { x: "50%", y: "33%" },
+                                completionVar: "iTurnImag",
+                                completionValue: 2,
+                                completionTolerance: 0.35,
+                            },
+                        ],
+                    }}
                 >
                     <InlineClozeInput
                         varName="answer_times_i_product"

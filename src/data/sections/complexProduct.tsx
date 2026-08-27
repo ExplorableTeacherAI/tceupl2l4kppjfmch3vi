@@ -383,7 +383,7 @@ export const complexProductBlocks: ReactElement[] = [
                     correctValue="-6"
                     position="terminal"
                     successMessage="— right, and notice it is not even on the imaginary axis any more: two numbers pointing straight up produce one pointing left"
-                    failureMessage="— 6i is what multiplying the parts separately gives, and that is exactly the trap."
+                    failureMessage="— 6i is what multiplying the parts separately gives, and that is exactly the trap. Choose again when you are ready."
                     hint="Each of these is a quarter turn away from the real axis, so together they are a half turn, and 2 × 3 = 6"
                     reviewBlockId="product-figure"
                     visualizationHint={{
@@ -431,9 +431,33 @@ export const complexProductBlocks: ReactElement[] = [
                     correctValue={["2+6i", "2 + 6i", "6i+2", "6i + 2"]}
                     position="terminal"
                     successMessage="— exactly, a real multiplier moves both parts, pushing the whole point twice as far from the origin"
-                    failureMessage="— careful, the 2 does not act on the real part alone."
-                    hint="Write the multiplier as 2 + 0i and ask what it does to the point as a whole, not to one piece of it"
+                    failureMessage="— careful, the 2 does not act on the real part alone. Click the box and try again."
+                    hint="Write the multiplier as 2 + 0i, put it on the real axis in the figure above, and watch what happens to the whole point"
                     reviewBlockId="product-figure"
+                    visualizationHint={{
+                        blockId: "product-figure",
+                        hintKey: "product-real-multiplier-hint",
+                        label: "Try it in the figure",
+                        resetVars: { productZReal: 1, productZImag: 2, productWReal: 1.6, productWImag: 1.2, productRevealed: true },
+                        steps: [
+                            {
+                                gesture: "drag-vertical",
+                                label: "Drag w down onto the real axis so it becomes a plain real number",
+                                position: { x: "58%", y: "40%" },
+                                completionVar: "productWImag",
+                                completionValue: 0,
+                                completionTolerance: 0.2,
+                            },
+                            {
+                                gesture: "drag-horizontal",
+                                label: "Slide w out to 2 — the product ends up twice as far out as z, in the same direction",
+                                position: { x: "62%", y: "45%" },
+                                completionVar: "productWReal",
+                                completionValue: 2,
+                                completionTolerance: 0.25,
+                            },
+                        ],
+                    }}
                 >
                     <InlineClozeInput
                         varName="answer_product_real"
