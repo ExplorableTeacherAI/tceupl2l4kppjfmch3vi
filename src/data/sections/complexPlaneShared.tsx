@@ -7,7 +7,7 @@
  */
 import React, { useRef, useState, type ReactNode } from "react";
 import { useVar, useSetVar } from "@/stores";
-import { useSpring, type Vec2 } from "@/lib/motion";
+import { clamp, useSpring, type Vec2 } from "@/lib/motion";
 
 // ── Ink and accent ───────────────────────────────────────────────────────────
 export const INK = "#334155";
@@ -210,6 +210,80 @@ export const HandleShadow = ({ id }: { id: string }) => (
         <feDropShadow dx="0" dy="1" stdDeviation="1.5" floodColor="#0F172A" floodOpacity="0.25" />
     </filter>
 );
+
+
+// ── Arrows out of the origin, with a live length annotation ─────────────────
+
+/** Arrowhead marker definition — one per colour, placed inside <defs>. */
+export const ArrowMarker = ({ id, color }: { id: string; color: string }) => (
+    <marker id={id} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+        <path d="M 0 1 L 9 5 L 0 9 z" fill={color} />
+    </marker>
+);
+
+/** Line from the origin to a point, stopping short so the handle stays clear. */
+export function OriginArrow({
+    plane,
+    x,
+    y,
+    color,
+    markerId,
+    weight = 2.5,
+}: {
+    plane: Plane;
+    x: number;
+    y: number;
+    color: string;
+    markerId?: string;
+    weight?: number;
+}) {
+    const dx = x - plane.originX;
+    const dy = y - plane.originY;
+    const length = Math.hypot(dx, dy);
+    if (length < 14) return null;
+    const shortened = Math.max(length - 12, 0) / length;
+    return (
+        <line
+            x1={plane.originX}
+            y1={plane.originY}
+            x2={plane.originX + dx * shortened}
+            y2={plane.originY + dy * shortened}
+            stroke={color}
+            strokeWidth={weight}
+            strokeLinecap="round"
+            {...(markerId ? { markerEnd: `url(#${markerId})` } : {})}
+        />
+    );
+}
+
+/** Live length readout, floated just off the middle of its own arrow. */
+export function MagnitudeLabel({
+    plane,
+    x,
+    y,
+    color,
+    text,
+}: {
+    plane: Plane;
+    x: number;
+    y: number;
+    color: string;
+    text: string;
+}) {
+    const dx = x - plane.originX;
+    const dy = y - plane.originY;
+    const length = Math.hypot(dx, dy) || 1;
+    const offsetX = (-dy / length) * 16;
+    const offsetY = (dx / length) * 16;
+    const halfWidth = text.length * 3.4;
+    const labelX = clamp(plane.originX + dx / 2 + offsetX, 24 + halfWidth, plane.width - 24 - halfWidth);
+    const labelY = clamp(plane.originY + dy / 2 + offsetY, 36, plane.height - 24);
+    return (
+        <text x={labelX} y={labelY} fill={color} fontSize="11" textAnchor="middle" style={{ fontVariantNumeric: "tabular-nums" }}>
+            {text}
+        </text>
+    );
+}
 
 // ── Quiet control button used for the predict-then-reveal figures ───────────
 export function FigureButton({

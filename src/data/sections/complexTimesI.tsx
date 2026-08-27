@@ -24,7 +24,10 @@ import {
 import {
     ACCENT,
     ACCENT_RESULT,
+    ArrowMarker,
     DragHandle,
+    MagnitudeLabel,
+    OriginArrow,
     EASE_150,
     FigureButton,
     Halo,
@@ -115,37 +118,26 @@ function TimesIDrawing() {
         >
             <defs>
                 <HandleShadow id={SHADOW} />
+                <ArrowMarker id="times-i-arrow-z" color={ACCENT} />
+                <ArrowMarker id="times-i-arrow-product" color={ACCENT_RESULT} />
             </defs>
 
             <PlaneAxes plane={PLANE} ticks={[-3, -2, -1, 1, 2, 3]} opacity={opacity("__structure")} />
 
             {/* Readouts live below the drawing surface, in each quantity's colour. */}
             <g fontSize="12" style={{ fontVariantNumeric: "tabular-nums", ...EASE_150 }}>
-                <text x="24" y="350" fill={ACCENT} opacity={opacity("__z")}>{`z = ${fmtComplex(real, imag)}`}</text>
-                <text x="24" y="372" fill={INK_STRUCTURE} opacity={opacity("length")}>
-                    {`distance from 0: ${fmtLength(modulus)}`}
-                </text>
+                <text x="24" y="360" fill={ACCENT} opacity={opacity("__z")}>{`z = ${fmtComplex(real, imag)}`}</text>
                 {showAnswer && (
-                    <>
-                        <text x={VIEW_W - 24} y="350" fill={ACCENT_RESULT} textAnchor="end" opacity={opacity("turn")}>
-                            {`i·z = ${fmtComplex(productReal, productImag)}`}
-                        </text>
-                        <text
-                            x={VIEW_W - 24}
-                            y="372"
-                            fill={INK_STRUCTURE}
-                            textAnchor="end"
-                            opacity={opacity("length")}
-                        >
-                            {`distance from 0: ${fmtLength(modulus)}`}
-                        </text>
-                    </>
+                    <text x={VIEW_W - 24} y="360" fill={ACCENT_RESULT} textAnchor="end" opacity={opacity("turn")}>
+                        {`i·z = ${fmtComplex(productReal, productImag)}`}
+                    </text>
                 )}
             </g>
 
-            {/* LENGTH group — the circle of unchanged distance and the two spokes. */}
-            {showAnswer && (
-                <g {...hoverProps("length")} opacity={opacity("length")} style={EASE_150}>
+            {/* LENGTH group — every number is an arrow out of the origin, and its
+                length is annotated live as the student drags. */}
+            <g {...hoverProps("length")} opacity={opacity("length")} style={EASE_150}>
+                {showAnswer && (
                     <circle
                         cx={PLANE.originX}
                         cy={PLANE.originY}
@@ -155,14 +147,22 @@ function TimesIDrawing() {
                         strokeWidth="1.5"
                         strokeDasharray="4 5"
                     />
-                    <Halo active={isActive("length")}>
-                        <line x1={PLANE.originX} y1={PLANE.originY} x2={zx} y2={zy} stroke={INK_STRUCTURE} strokeWidth={weight("length", 2) + 6} strokeLinecap="round" />
-                        <line x1={PLANE.originX} y1={PLANE.originY} x2={px} y2={py} stroke={INK_STRUCTURE} strokeWidth={weight("length", 2) + 6} strokeLinecap="round" />
-                    </Halo>
-                    <line x1={PLANE.originX} y1={PLANE.originY} x2={zx} y2={zy} stroke={INK_STRUCTURE} strokeWidth={weight("length", 2)} strokeLinecap="round" />
-                    <line x1={PLANE.originX} y1={PLANE.originY} x2={px} y2={py} stroke={INK_STRUCTURE} strokeWidth={weight("length", 2)} strokeLinecap="round" />
-                </g>
-            )}
+                )}
+                <Halo active={isActive("length")}>
+                    <OriginArrow plane={PLANE} x={zx} y={zy} color={ACCENT} weight={weight("length", 2.5) + 6} />
+                    {showAnswer && (
+                        <OriginArrow plane={PLANE} x={px} y={py} color={ACCENT_RESULT} weight={weight("length", 2.5) + 6} />
+                    )}
+                </Halo>
+                <OriginArrow plane={PLANE} x={zx} y={zy} color={ACCENT} markerId="times-i-arrow-z" weight={weight("length", 2.5)} />
+                <MagnitudeLabel plane={PLANE} x={zx} y={zy} color={ACCENT} text={`|z| = ${fmtLength(modulus)}`} />
+                {showAnswer && (
+                    <>
+                        <OriginArrow plane={PLANE} x={px} y={py} color={ACCENT_RESULT} markerId="times-i-arrow-product" weight={weight("length", 2.5)} />
+                        <MagnitudeLabel plane={PLANE} x={px} y={py} color={ACCENT_RESULT} text={`|i·z| = ${fmtLength(modulus)}`} />
+                    </>
+                )}
+            </g>
 
             {/* TURN group — the quarter turn itself, the accent of this figure. */}
             {showAnswer && (
@@ -239,7 +239,7 @@ function TimesIFigure() {
                 setVar("iTurnRevealed", false);
                 setVar("iTurnHighlight", "");
             }}
-            caption="Drag the dashed marker to your prediction for i·z, then reveal. The teal point z is draggable too, so you can test any number."
+            caption="Drag the dashed marker to your prediction for i·z, then reveal. The teal arrow follows z as you drag it, reporting its length live."
         >
             <TimesIDrawing />
             <div className="flex items-center gap-3 px-6 pb-5">
@@ -334,7 +334,7 @@ export const complexTimesIBlocks: ReactElement[] = [
                     correctValue="exactly the same"
                     position="terminal"
                     successMessage="— yes, and that is the whole point: i is a pure turn, so nothing about the size changes"
-                    failureMessage="— that is the usual expectation, but the two distance readouts never disagree. Pick again whenever you are ready."
+                    failureMessage="— that is the usual expectation, but the |z| and |i·z| labels on the two arrows never disagree. Pick again whenever you are ready."
                     hint="Multiplying by i is a rotation, and rotations do not resize anything"
                     reviewBlockId="times-i-figure"
                     visualizationHint={{
@@ -345,7 +345,7 @@ export const complexTimesIBlocks: ReactElement[] = [
                         steps: [
                             {
                                 gesture: "drag",
-                                label: "Drag the teal point z out along the real axis — watch both distance readouts",
+                                label: "Drag the teal point z out along the real axis — watch the |z| and |i·z| labels",
                                 position: { x: "76%", y: "45%" },
                                 completionVar: "iTurnReal",
                                 completionValue: 3,
@@ -353,7 +353,7 @@ export const complexTimesIBlocks: ReactElement[] = [
                             },
                             {
                                 gesture: "drag",
-                                label: "Now drag z high up instead — the two readouts still match",
+                                label: "Now drag z high up instead — the two lengths still match",
                                 position: { x: "62%", y: "22%" },
                                 completionVar: "iTurnImag",
                                 completionValue: 2.5,

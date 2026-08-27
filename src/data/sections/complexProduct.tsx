@@ -22,7 +22,10 @@ import {
 import {
     ACCENT,
     ACCENT_RESULT,
+    ArrowMarker,
     DragHandle,
+    MagnitudeLabel,
+    OriginArrow,
     EASE_150,
     FigureButton,
     HandleShadow,
@@ -50,73 +53,6 @@ const DEFAULTS = {
     guessReal: 2.6,
     guessImag: -1.2,
 };
-
-/** Arrow from the origin to a point, stopping short so the handle stays clear. */
-function OriginArrow({
-    x,
-    y,
-    color,
-    markerId,
-    weight = 2.5,
-}: {
-    x: number;
-    y: number;
-    color: string;
-    markerId: string;
-    weight?: number;
-}) {
-    const dx = x - PLANE.originX;
-    const dy = y - PLANE.originY;
-    const length = Math.hypot(dx, dy);
-    if (length < 14) return null;
-    const shortened = Math.max(length - 12, 0) / length;
-    return (
-        <line
-            x1={PLANE.originX}
-            y1={PLANE.originY}
-            x2={PLANE.originX + dx * shortened}
-            y2={PLANE.originY + dy * shortened}
-            stroke={color}
-            strokeWidth={weight}
-            strokeLinecap="round"
-            markerEnd={`url(#${markerId})`}
-        />
-    );
-}
-
-/** Live length readout, floated just off the middle of its own arrow. */
-function MagnitudeLabel({
-    x,
-    y,
-    color,
-    text,
-}: {
-    x: number;
-    y: number;
-    color: string;
-    text: string;
-}) {
-    const dx = x - PLANE.originX;
-    const dy = y - PLANE.originY;
-    const length = Math.hypot(dx, dy) || 1;
-    const offsetX = (-dy / length) * 16;
-    const offsetY = (dx / length) * 16;
-    const halfWidth = text.length * 3.4;
-    const labelX = clamp(PLANE.originX + dx / 2 + offsetX, 24 + halfWidth, VIEW_W - 24 - halfWidth);
-    const labelY = clamp(PLANE.originY + dy / 2 + offsetY, 36, 336);
-    return (
-        <text
-            x={labelX}
-            y={labelY}
-            fill={color}
-            fontSize="11"
-            textAnchor="middle"
-            style={{ fontVariantNumeric: "tabular-nums" }}
-        >
-            {text}
-        </text>
-    );
-}
 
 const sideLabel = (x: number, textWidth: number) =>
     x + 14 + textWidth > VIEW_W - 24
@@ -183,12 +119,8 @@ function ProductDrawing() {
         >
             <defs>
                 <HandleShadow id={SHADOW} />
-                <marker id="product-arrow-factor" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                    <path d="M 0 1 L 9 5 L 0 9 z" fill={ACCENT} />
-                </marker>
-                <marker id="product-arrow-result" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
-                    <path d="M 0 1 L 9 5 L 0 9 z" fill={ACCENT_RESULT} />
-                </marker>
+                <ArrowMarker id="product-arrow-factor" color={ACCENT} />
+                <ArrowMarker id="product-arrow-result" color={ACCENT_RESULT} />
             </defs>
 
             <PlaneAxes plane={PLANE} ticks={[-5, -4, -3, -2, -1, 1, 2, 3, 4, 5]} />
@@ -212,10 +144,10 @@ function ProductDrawing() {
 
             {/* Each number, drawn as an arrow out of the origin with its live length. */}
             <g style={EASE_150}>
-                <OriginArrow x={zx} y={zy} color={ACCENT} markerId="product-arrow-factor" />
-                <OriginArrow x={wx} y={wy} color={ACCENT} markerId="product-arrow-factor" />
-                <MagnitudeLabel x={zx} y={zy} color={ACCENT} text={`|z| = ${fmtLength(Math.hypot(zReal, zImag))}`} />
-                <MagnitudeLabel x={wx} y={wy} color={ACCENT} text={`|w| = ${fmtLength(Math.hypot(wReal, wImag))}`} />
+                <OriginArrow plane={PLANE} x={zx} y={zy} color={ACCENT} markerId="product-arrow-factor" />
+                <OriginArrow plane={PLANE} x={wx} y={wy} color={ACCENT} markerId="product-arrow-factor" />
+                <MagnitudeLabel plane={PLANE} x={zx} y={zy} color={ACCENT} text={`|z| = ${fmtLength(Math.hypot(zReal, zImag))}`} />
+                <MagnitudeLabel plane={PLANE} x={wx} y={wy} color={ACCENT} text={`|w| = ${fmtLength(Math.hypot(wReal, wImag))}`} />
             </g>
 
             {revealed && (
@@ -239,8 +171,8 @@ function ProductDrawing() {
 
             {revealed && (
                 <g style={EASE_150}>
-                    <OriginArrow x={px} y={py} color={ACCENT_RESULT} markerId="product-arrow-result" weight={3} />
-                    <MagnitudeLabel x={px} y={py} color={ACCENT_RESULT} text={`|z·w| = ${fmtLength(Math.hypot(productReal, productImag))}`} />
+                    <OriginArrow plane={PLANE} x={px} y={py} color={ACCENT_RESULT} markerId="product-arrow-result" weight={3} />
+                    <MagnitudeLabel plane={PLANE} x={px} y={py} color={ACCENT_RESULT} text={`|z·w| = ${fmtLength(Math.hypot(productReal, productImag))}`} />
                     <circle cx={px} cy={py} r="8" fill={ACCENT_RESULT} filter={`url(#${SHADOW})`} />
                     <text x={px + pLabel.dx} y={py + 4} fill={ACCENT_RESULT} fontSize="12" textAnchor={pLabel.anchor}>
                         z·w
