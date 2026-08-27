@@ -5,6 +5,11 @@ import { type ReactElement } from "react";
 // Initialize variables and their colors from this file's variable definitions
 import { useVariableStore, initializeVariableColors } from "@/stores";
 import { getDefaultValues, variableDefinitions } from "./variables";
+import { complexIntroBlocks } from "./sections/complexIntro";
+import { complexTimesIBlocks } from "./sections/complexTimesI";
+import { complexProductBlocks } from "./sections/complexProduct";
+import { complexPolarBlocks } from "./sections/complexPolar";
+import { complexConclusionBlocks } from "./sections/complexConclusion";
 useVariableStore.getState().initialize(getDefaultValues());
 initializeVariableColors(variableDefinitions);
 
@@ -85,5 +90,9 @@ initializeVariableColors(variableDefinitions);
  */
 
 export const blocks: ReactElement[] = [
-    // Start adding your blocks here!
+    ...complexIntroBlocks,
+    ...complexTimesIBlocks,
+    ...complexProductBlocks,
+    ...complexPolarBlocks,
+    ...complexConclusionBlocks,
 ];
