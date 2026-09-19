@@ -268,7 +268,7 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         min: -2.2,
         max: 2.2,
         step: 0.1,
-        color: '#62D0AD',
+        color: '#F7B23B',
     },
     productWImag: {
         defaultValue: 2,
@@ -278,7 +278,7 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         min: -2.2,
         max: 2.2,
         step: 0.1,
-        color: '#62D0AD',
+        color: '#F7B23B',
     },
     productGuessReal: {
         defaultValue: 2.6,
@@ -358,7 +358,7 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         min: 0.6,
         max: 2,
         step: 0.1,
-        color: '#62D0AD',
+        color: '#F7B23B',
     },
     polarWAngle: {
         defaultValue: 45,
@@ -369,7 +369,7 @@ export const variableDefinitions: Record<string, VariableDefinition> = {
         min: 0,
         max: 120,
         step: 1,
-        color: '#62D0AD',
+        color: '#F7B23B',
     },
     polarHighlight: {
         defaultValue: '',

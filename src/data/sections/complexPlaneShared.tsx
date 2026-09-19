@@ -13,7 +13,8 @@ import { clamp, useSpring, type Vec2 } from "@/lib/motion";
 export const INK = "#334155";
 export const INK_STRUCTURE = "#64748B";
 export const INK_QUIET = "#CBD5E1";
-export const ACCENT = "#62D0AD"; // the numbers you manipulate
+export const ACCENT = "#62D0AD"; // z, the number you manipulate
+export const ACCENT_SECOND = "#F7B23B"; // w, the second factor — its own hue so z and w never blur together
 export const ACCENT_RESULT = "#8E90F5"; // the product they produce (covariation partner)
 
 export const EASE_150 = {

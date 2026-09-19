@@ -1,7 +1,7 @@
 import { type ReactElement } from "react";
 import { Block } from "@/components/templates";
 import { StackLayout } from "@/components/layouts";
-import { EditableH2, EditableParagraph } from "@/components/atoms";
+import { EditableH2, EditableParagraph, InlineTooltip } from "@/components/atoms";
 
 export const complexConclusionBlocks: ReactElement[] = [
     <StackLayout key="layout-complex-conclusion-heading" maxWidth="xl">
@@ -26,7 +26,10 @@ export const complexConclusionBlocks: ReactElement[] = [
     <StackLayout key="layout-complex-conclusion-next" maxWidth="xl">
         <Block id="complex-conclusion-next" padding="sm">
             <EditableParagraph id="para-complex-conclusion-next" blockId="complex-conclusion-next">
-                That single fact is why complex numbers turn up wherever things rotate: the phase
+                That single fact is why complex numbers turn up wherever things rotate: the{" "}
+                <InlineTooltip id="tooltip-complex-conclusion-phase" tooltip="How far through its repeating cycle a wave is, measured as an angle." color="#2563EB" bgColor="rgba(37, 99, 235, 0.12)">
+                    phase
+                </InlineTooltip>{" "}
                 of an alternating current, a wave arriving slightly late, the spin of a sprite on
                 screen. One multiplication carries both the scaling and the rotation at the same
                 time. Next comes the polar form, which writes a number as exactly the two things

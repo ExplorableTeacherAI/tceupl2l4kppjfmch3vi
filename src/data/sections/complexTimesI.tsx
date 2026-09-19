@@ -7,6 +7,7 @@ import {
     InlineClozeChoice,
     InlineClozeInput,
     InlineFeedback,
+    InlineFormula,
     InlineLinkedHighlight,
     InlineScrubbleNumber,
     InteractionHintSequence,
@@ -275,7 +276,8 @@ export const complexTimesIBlocks: ReactElement[] = [
     <StackLayout key="layout-times-i-setup" maxWidth="xl">
         <Block id="times-i-setup" padding="sm">
             <EditableParagraph id="para-times-i-setup" blockId="times-i-setup">
-                Start with the simplest multiplier there is: i itself. Take the number z ={" "}
+                Start with the simplest multiplier there is: i itself. Take the number{" "}
+                <InlineFormula id="formula-times-i-setup-z" latex="\clr{z}{z}" colorMap={{ z: "#62D0AD" }} /> ={" "}
                 <InlineScrubbleNumber
                     varName="iTurnReal"
                     {...numberPropsFromDefinition(getVariableInfo('iTurnReal'))}
@@ -288,7 +290,8 @@ export const complexTimesIBlocks: ReactElement[] = [
                     formatValue={(value) => value.toFixed(1)}
                 />
                 i and commit to an answer before you see one: drag the dashed marker to where you
-                think i·z lands, then reveal it.
+                think <InlineFormula id="formula-times-i-setup-product" latex="\clr{product}{i \cdot z}" colorMap={{ product: "#8E90F5" }} />{" "}
+                lands, then reveal it.
             </EditableParagraph>
         </Block>
     </StackLayout>,
@@ -302,7 +305,8 @@ export const complexTimesIBlocks: ReactElement[] = [
     <StackLayout key="layout-times-i-reflect" maxWidth="xl">
         <Block id="times-i-reflect" padding="sm">
             <EditableParagraph id="para-times-i-reflect" blockId="times-i-reflect">
-                Wherever you put z, the answer keeps its{" "}
+                Wherever you put <InlineFormula id="formula-times-i-reflect-z" latex="\clr{z}{z}" colorMap={{ z: "#62D0AD" }} />,
+                the answer keeps its{" "}
                 <InlineLinkedHighlight
                     varName="iTurnHighlight"
                     highlightId="length"
@@ -315,6 +319,8 @@ export const complexTimesIBlocks: ReactElement[] = [
                     varName="iTurnHighlight"
                     highlightId="turn"
                     {...linkedHighlightPropsFromDefinition(getVariableInfo('iTurnHighlight'))}
+                    color="#8E90F5"
+                    bgColor="rgba(142, 144, 245, 0.22)"
                 >
                     quarter turn
                 </InlineLinkedHighlight>{" "}
@@ -376,7 +382,8 @@ export const complexTimesIBlocks: ReactElement[] = [
     <StackLayout key="layout-times-i-question-double" maxWidth="xl">
         <Block id="times-i-question-double" padding="md">
             <EditableParagraph id="para-times-i-question-double" blockId="times-i-question-double">
-                A point sits at 2i, straight up the imaginary axis. Multiplying it by i turns it
+                A point sits at <InlineFormula id="formula-times-i-question-double-z" latex="\clr{z}{2i}" colorMap={{ z: "#62D0AD" }} />,
+                straight up the imaginary axis. Multiplying it by i turns it
                 another quarter turn, landing it at{" "}
                 <InlineFeedback
                     varName="answer_times_i_product"

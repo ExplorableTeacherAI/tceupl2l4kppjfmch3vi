@@ -6,11 +6,13 @@ import {
     EditableParagraph,
     InlineClozeInput,
     InlineFeedback,
+    InlineFormula,
     InlineLinkedHighlight,
     InlineScrubbleNumber,
+    InlineTrigger,
     InteractionHintSequence,
 } from "@/components/atoms";
-import { Figure, FigureSlider } from "@/components/molecules";
+import { Figure, FigureSlider, FormulaBlock } from "@/components/molecules";
 import { useVar, useSetVar } from "@/stores";
 import { clamp } from "@/lib/motion";
 import {
@@ -18,10 +20,12 @@ import {
     getVariableInfo,
     linkedHighlightPropsFromDefinition,
     numberPropsFromDefinition,
+    scrubVarsFromDefinitions,
 } from "../variables";
 import {
     ACCENT,
     ACCENT_RESULT,
+    ACCENT_SECOND,
     DragHandle,
     EASE_150,
     Halo,
@@ -132,18 +136,18 @@ function PolarPlaneDrawing() {
             </g>
 
             {spoke("z-spoke", z, ACCENT, 2.5)}
-            {spoke("w-spoke", w, ACCENT, 2.5)}
+            {spoke("w-spoke", w, ACCENT_SECOND, 2.5)}
             {spoke("product-spoke", product, ACCENT_RESULT, 3)}
 
             {/* ANGLE group — three arcs at three radii so none hides another. */}
             <g {...hoverProps("angle")} opacity={opacity("angle")} style={EASE_150}>
                 <Halo active={isActive("angle")}>
                     <path d={arcPath(30, 0, zAngle)} fill="none" stroke={ACCENT} strokeWidth={weight("angle", 2) + 6} strokeLinecap="round" />
-                    <path d={arcPath(44, 0, wAngle)} fill="none" stroke={ACCENT} strokeWidth={weight("angle", 2) + 6} strokeLinecap="round" />
+                    <path d={arcPath(44, 0, wAngle)} fill="none" stroke={ACCENT_SECOND} strokeWidth={weight("angle", 2) + 6} strokeLinecap="round" />
                     <path d={arcPath(58, 0, productAngle)} fill="none" stroke={ACCENT_RESULT} strokeWidth={weight("angle", 2.5) + 6} strokeLinecap="round" />
                 </Halo>
                 <path d={arcPath(30, 0, zAngle)} fill="none" stroke={ACCENT} strokeWidth={weight("angle", 2)} strokeLinecap="round" />
-                <path d={arcPath(44, 0, wAngle)} fill="none" stroke={ACCENT} strokeWidth={weight("angle", 2)} strokeLinecap="round" />
+                <path d={arcPath(44, 0, wAngle)} fill="none" stroke={ACCENT_SECOND} strokeWidth={weight("angle", 2)} strokeLinecap="round" />
                 <path d={arcPath(58, 0, productAngle)} fill="none" stroke={ACCENT_RESULT} strokeWidth={weight("angle", 2.5)} strokeLinecap="round" />
             </g>
 
@@ -151,12 +155,12 @@ function PolarPlaneDrawing() {
                 <text x={product.x + 12} y={product.y + 4} fill={ACCENT_RESULT}>z·w</text>
                 <circle cx={product.x} cy={product.y} r="7" fill={ACCENT_RESULT} />
                 <text x={z.x + 14} y={z.y + 4} fill={ACCENT}>z</text>
-                <text x={w.x + 14} y={w.y + 4} fill={ACCENT}>w</text>
+                <text x={w.x + 14} y={w.y + 4} fill={ACCENT_SECOND}>w</text>
             </g>
 
             <g opacity={opacity("__labels")} style={EASE_150}>
                 <DragHandle x={z.x} y={z.y} color={ACCENT} shadowId="polar-plane-shadow" onDrag={dragTo("polarZRadius", "polarZAngle")} />
-                <DragHandle x={w.x} y={w.y} color={ACCENT} shadowId="polar-plane-shadow" onDrag={dragTo("polarWRadius", "polarWAngle")} />
+                <DragHandle x={w.x} y={w.y} color={ACCENT_SECOND} shadowId="polar-plane-shadow" onDrag={dragTo("polarWRadius", "polarWAngle")} />
             </g>
         </svg>
     );
@@ -226,15 +230,15 @@ function PolarTracksDrawing() {
 
                 <Halo active={isActive("angle")}>
                     <line x1={TRACK_X0} y1={ANGLE_TRACK_Y} x2={zEnd} y2={ANGLE_TRACK_Y} stroke={ACCENT} strokeWidth={weight("angle", 3) + 6} strokeLinecap="round" />
-                    <line x1={zEnd + 4} y1={ANGLE_TRACK_Y} x2={totalEnd} y2={ANGLE_TRACK_Y} stroke={ACCENT} strokeWidth={weight("angle", 3) + 6} strokeLinecap="round" />
+                    <line x1={zEnd + 4} y1={ANGLE_TRACK_Y} x2={totalEnd} y2={ANGLE_TRACK_Y} stroke={ACCENT_SECOND} strokeWidth={weight("angle", 3) + 6} strokeLinecap="round" />
                 </Halo>
                 <line x1={TRACK_X0} y1={ANGLE_TRACK_Y} x2={zEnd} y2={ANGLE_TRACK_Y} stroke={ACCENT} strokeWidth={weight("angle", 3)} strokeLinecap="round" />
-                <line x1={zEnd + 4} y1={ANGLE_TRACK_Y} x2={totalEnd} y2={ANGLE_TRACK_Y} stroke={ACCENT} strokeWidth={weight("angle", 3)} strokeLinecap="round" />
+                <line x1={zEnd + 4} y1={ANGLE_TRACK_Y} x2={totalEnd} y2={ANGLE_TRACK_Y} stroke={ACCENT_SECOND} strokeWidth={weight("angle", 3)} strokeLinecap="round" />
 
                 <text x={clampCenter((TRACK_X0 + zEnd) / 2, 30)} y={ANGLE_TRACK_Y - 12} fill={ACCENT} fontSize="11" textAnchor="middle" style={{ fontVariantNumeric: "tabular-nums" }}>
                     {`z: ${fmtAngle(zAngle)}`}
                 </text>
-                <text x={clampCenter((zEnd + totalEnd) / 2, 30)} y={ANGLE_TRACK_Y + 22} fill={ACCENT} fontSize="11" textAnchor="middle" style={{ fontVariantNumeric: "tabular-nums" }}>
+                <text x={clampCenter((zEnd + totalEnd) / 2, 30)} y={ANGLE_TRACK_Y + 22} fill={ACCENT_SECOND} fontSize="11" textAnchor="middle" style={{ fontVariantNumeric: "tabular-nums" }}>
                     {`w: ${fmtAngle(wAngle)}`}
                 </text>
 
@@ -266,11 +270,41 @@ function PolarTracksDrawing() {
                 {/* Where z's own length reached — the before-state, still visible. */}
                 <line x1={ghostEnd} y1={LENGTH_BAR_Y - 10} x2={ghostEnd} y2={GHOST_BAR_Y + 8} stroke={INK_QUIET} strokeWidth="1.5" strokeDasharray="3 4" />
                 <text x={clampCenter((ghostEnd + productEnd) / 2, 36)} y={GHOST_BAR_Y - 8} fill={INK_STRUCTURE} fontSize="11" textAnchor="middle" style={{ fontVariantNumeric: "tabular-nums" }}>
-                    {`× w = ${fmtLength(wRadius)}`}
+                    {"× "}
+                    <tspan fill={ACCENT_SECOND}>{`w = ${fmtLength(wRadius)}`}</tspan>
                 </text>
                 <DragHandle x={productEnd} y={LENGTH_BAR_Y} color={ACCENT_RESULT} shadowId="polar-tracks-shadow" radius={7} onDrag={dragLengthTotal} />
             </g>
         </svg>
+    );
+}
+
+// The rule itself, with the same four numbers the two figures are drawn from.
+// Scrubbing a number here moves z or w on the plane and on the tracks.
+const POLAR_RULE_VARIABLES = (() => {
+    const fromDefinitions = scrubVarsFromDefinitions(["polarZRadius", "polarWRadius", "polarZAngle", "polarWAngle"]);
+    return {
+        ...fromDefinitions,
+        polarZRadius: { ...fromDefinitions.polarZRadius, formatValue: fmtLength },
+        polarWRadius: { ...fromDefinitions.polarWRadius, formatValue: fmtLength },
+    };
+})();
+
+// fmtAngle's rounding, with the degree sign written the ASCII way KaTeX needs.
+const fmtAngleLatex = (degrees: number) => `${Math.round(degrees)}^\\circ`;
+
+function PolarRuleFormula() {
+    const zRadius = useVar<number>("polarZRadius", DEFAULTS.zRadius);
+    const zAngle = useVar<number>("polarZAngle", DEFAULTS.zAngle);
+    const wRadius = useVar<number>("polarWRadius", DEFAULTS.wRadius);
+    const wAngle = useVar<number>("polarWAngle", DEFAULTS.wAngle);
+
+    return (
+        <FormulaBlock
+            latex={`\\begin{aligned} \\text{length of } \\clr{product}{z \\cdot w} &= \\scrub{polarZRadius} \\times \\scrub{polarWRadius} = \\clr{product}{${fmtLength(zRadius * wRadius)}} \\\\[6pt] \\text{angle of } \\clr{product}{z \\cdot w} &= \\scrub{polarZAngle}^\\circ + \\scrub{polarWAngle}^\\circ = \\clr{product}{${fmtAngleLatex(zAngle + wAngle)}} \\end{aligned}`}
+            colorMap={{ product: "#8E90F5" }}
+            variables={POLAR_RULE_VARIABLES}
+        />
     );
 }
 
@@ -368,13 +402,15 @@ export const complexPolarBlocks: ReactElement[] = [
                 >
                     angle
                 </InlineLinkedHighlight>{" "}
-                from the real axis, and w is sitting at{" "}
+                from the real axis, and <InlineFormula id="formula-polar-setup-w-angle" latex="\clr{w}{w}" colorMap={{ w: "#F7B23B" }} /> is
+                sitting at{" "}
                 <InlineScrubbleNumber
                     varName="polarWAngle"
                     {...numberPropsFromDefinition(getVariableInfo('polarWAngle'))}
                     formatValue={fmtAngle}
                 />{" "}
-                right now. Drag z or w on the plane, or pull the indigo markers on the tracks
+                right now. Drag <InlineFormula id="formula-polar-setup-z" latex="\clr{z}{z}" colorMap={{ z: "#62D0AD" }} /> or{" "}
+                <InlineFormula id="formula-polar-setup-w" latex="\clr{w}{w}" colorMap={{ w: "#F7B23B" }} /> on the plane, or pull the indigo markers on the tracks
                 beside it, and follow what happens to each of those two facts for the product.
             </EditableParagraph>
         </Block>
@@ -394,16 +430,35 @@ export const complexPolarBlocks: ReactElement[] = [
             <EditableParagraph id="para-polar-reflect" blockId="polar-reflect">
                 The product's angle is never the two angles multiplied together; the second angle
                 simply carries on where the first one stopped. Its length is never the two lengths
-                added; w stretches z the way a scale factor does. That is the whole of complex
-                multiplication, and multiplying by i was just the case with length 1 and angle 90°.
+                added; <InlineFormula id="formula-polar-reflect-w" latex="\clr{w}{w}" colorMap={{ w: "#F7B23B" }} /> stretches{" "}
+                <InlineFormula id="formula-polar-reflect-z" latex="\clr{z}{z}" colorMap={{ z: "#62D0AD" }} /> the way a scale factor does. That is the whole of complex
+                multiplication, and multiplying by i was just the case with{" "}
+                <InlineTrigger id="trigger-polar-reflect-unit-length" varName="polarWRadius" value={1} color="#F7B23B" bgColor="rgba(247, 178, 59, 0.15)">
+                    length 1
+                </InlineTrigger>{" "}
+                and{" "}
+                <InlineTrigger id="trigger-polar-reflect-quarter-angle" varName="polarWAngle" value={90} color="#F7B23B" bgColor="rgba(247, 178, 59, 0.15)">
+                    angle 90°
+                </InlineTrigger>.
             </EditableParagraph>
+        </Block>
+    </StackLayout>,
+
+    <StackLayout key="layout-polar-rule-formula" maxWidth="xl">
+        <Block id="polar-rule-formula" padding="md">
+            <PolarRuleFormula />
         </Block>
     </StackLayout>,
 
     <StackLayout key="layout-polar-question-length" maxWidth="xl">
         <Block id="polar-question-length" padding="md">
             <EditableParagraph id="para-polar-question-length" blockId="polar-question-length">
-                Take z with length 3 at an angle of 40°, and w with length 2 at an angle of 25°.
+                Take <InlineFormula id="formula-polar-question-length-z" latex="\clr{z}{z}" colorMap={{ z: "#62D0AD" }} /> with
+                length <InlineFormula id="formula-polar-question-length-z-length" latex="\clr{z}{3}" colorMap={{ z: "#62D0AD" }} /> at
+                an angle of <InlineFormula id="formula-polar-question-length-z-angle" latex="\clr{z}{40^\circ}" colorMap={{ z: "#62D0AD" }} />,
+                and <InlineFormula id="formula-polar-question-length-w" latex="\clr{w}{w}" colorMap={{ w: "#F7B23B" }} /> with
+                length <InlineFormula id="formula-polar-question-length-w-length" latex="\clr{w}{2}" colorMap={{ w: "#F7B23B" }} /> at
+                an angle of <InlineFormula id="formula-polar-question-length-w-angle" latex="\clr{w}{25^\circ}" colorMap={{ w: "#F7B23B" }} />.
                 Their product has length{" "}
                 <InlineFeedback
                     varName="answer_polar_modulus"

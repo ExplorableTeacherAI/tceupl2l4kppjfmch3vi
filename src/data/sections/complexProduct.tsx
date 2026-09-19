@@ -7,6 +7,7 @@ import {
     InlineClozeChoice,
     InlineClozeInput,
     InlineFeedback,
+    InlineFormula,
     InlineScrubbleNumber,
     InteractionHintSequence,
 } from "@/components/atoms";
@@ -22,6 +23,7 @@ import {
 import {
     ACCENT,
     ACCENT_RESULT,
+    ACCENT_SECOND,
     ArrowMarker,
     DragHandle,
     MagnitudeLabel,
@@ -120,6 +122,7 @@ function ProductDrawing() {
             <defs>
                 <HandleShadow id={SHADOW} />
                 <ArrowMarker id="product-arrow-factor" color={ACCENT} />
+                <ArrowMarker id="product-arrow-second-factor" color={ACCENT_SECOND} />
                 <ArrowMarker id="product-arrow-result" color={ACCENT_RESULT} />
             </defs>
 
@@ -127,7 +130,7 @@ function ProductDrawing() {
 
             <g fontSize="12" style={{ fontVariantNumeric: "tabular-nums" }}>
                 <text x="24" y="350" fill={ACCENT}>{`z = ${fmtComplex(zReal, zImag)}`}</text>
-                <text x={VIEW_W - 24} y="350" fill={ACCENT} textAnchor="end">
+                <text x={VIEW_W - 24} y="350" fill={ACCENT_SECOND} textAnchor="end">
                     {`w = ${fmtComplex(wReal, wImag)}`}
                 </text>
                 {revealed && (
@@ -145,9 +148,9 @@ function ProductDrawing() {
             {/* Each number, drawn as an arrow out of the origin with its live length. */}
             <g style={EASE_150}>
                 <OriginArrow plane={PLANE} x={zx} y={zy} color={ACCENT} markerId="product-arrow-factor" />
-                <OriginArrow plane={PLANE} x={wx} y={wy} color={ACCENT} markerId="product-arrow-factor" />
+                <OriginArrow plane={PLANE} x={wx} y={wy} color={ACCENT_SECOND} markerId="product-arrow-second-factor" />
                 <MagnitudeLabel plane={PLANE} x={zx} y={zy} color={ACCENT} text={`|z| = ${fmtLength(Math.hypot(zReal, zImag))}`} />
-                <MagnitudeLabel plane={PLANE} x={wx} y={wy} color={ACCENT} text={`|w| = ${fmtLength(Math.hypot(wReal, wImag))}`} />
+                <MagnitudeLabel plane={PLANE} x={wx} y={wy} color={ACCENT_SECOND} text={`|w| = ${fmtLength(Math.hypot(wReal, wImag))}`} />
             </g>
 
             {revealed && (
@@ -187,10 +190,10 @@ function ProductDrawing() {
                 <DragHandle x={zx} y={zy} color={ACCENT} shadowId={SHADOW} onDrag={dragTo("productZReal", "productZImag", FACTOR_LIMIT)} />
             </g>
             <g>
-                <text x={wx + wLabel.dx} y={wy + 4} fill={ACCENT} fontSize="12" textAnchor={wLabel.anchor}>
+                <text x={wx + wLabel.dx} y={wy + 4} fill={ACCENT_SECOND} fontSize="12" textAnchor={wLabel.anchor}>
                     w
                 </text>
-                <DragHandle x={wx} y={wy} color={ACCENT} shadowId={SHADOW} onDrag={dragTo("productWReal", "productWImag", FACTOR_LIMIT)} />
+                <DragHandle x={wx} y={wy} color={ACCENT_SECOND} shadowId={SHADOW} onDrag={dragTo("productWReal", "productWImag", FACTOR_LIMIT)} />
             </g>
         </svg>
     );
@@ -237,7 +240,7 @@ function ProductFigure() {
                 setVar("productGuessImag", DEFAULTS.guessImag);
                 setVar("productRevealed", false);
             }}
-            caption="Drag the dashed marker to your prediction for z·w, then reveal. Drag either teal point too: each arrow reports its own length as it moves."
+            caption="Drag the dashed marker to your prediction for z·w, then reveal. Drag teal z or amber w too: each arrow reports its own length as it moves."
         >
             <ProductDrawing />
             <div className="flex items-center gap-3 px-6 pb-5">
@@ -273,17 +276,19 @@ export const complexProductBlocks: ReactElement[] = [
     <StackLayout key="layout-product-setup" maxWidth="xl">
         <Block id="product-setup" padding="sm">
             <EditableParagraph id="para-product-setup" blockId="product-setup">
-                Now two ordinary numbers: z ={" "}
+                Now two ordinary numbers:{" "}
+                <InlineFormula id="formula-product-setup-z" latex="\clr{z}{z}" colorMap={{ z: "#62D0AD" }} /> ={" "}
                 <InlineScrubbleNumber varName="productZReal" {...numberPropsFromDefinition(getVariableInfo('productZReal'))} formatValue={(value) => value.toFixed(1)} />
                 {" "}+{" "}
                 <InlineScrubbleNumber varName="productZImag" {...numberPropsFromDefinition(getVariableInfo('productZImag'))} formatValue={(value) => value.toFixed(1)} />
-                i and w ={" "}
+                i and <InlineFormula id="formula-product-setup-w" latex="\clr{w}{w}" colorMap={{ w: "#F7B23B" }} /> ={" "}
                 <InlineScrubbleNumber varName="productWReal" {...numberPropsFromDefinition(getVariableInfo('productWReal'))} formatValue={(value) => value.toFixed(1)} />
                 {" "}+{" "}
                 <InlineScrubbleNumber varName="productWImag" {...numberPropsFromDefinition(getVariableInfo('productWImag'))} formatValue={(value) => value.toFixed(1)} />
                 i. The tempting move is to multiply the real parts together, multiply the
-                imaginary parts together, and call it done. Put your guess for z·w on the plane
-                first, then reveal where it truly lands.
+                imaginary parts together, and call it done. Put your guess for{" "}
+                <InlineFormula id="formula-product-setup-product" latex="\clr{product}{z \cdot w}" colorMap={{ product: "#8E90F5" }} />{" "}
+                on the plane first, then reveal where it truly lands.
             </EditableParagraph>
         </Block>
     </StackLayout>,
@@ -298,8 +303,10 @@ export const complexProductBlocks: ReactElement[] = [
         <Block id="product-reflect" padding="sm">
             <EditableParagraph id="para-product-reflect" blockId="product-reflect">
                 The hollow marker labelled parts shows what multiplying the pieces separately
-                would give, and the real product sits somewhere else entirely. Drag either teal
-                point and the two answers keep disagreeing. Each number acts on the other as a
+                would give, and the real product sits somewhere else entirely. Drag{" "}
+                <InlineFormula id="formula-product-reflect-z" latex="\clr{z}{z}" colorMap={{ z: "#62D0AD" }} /> or{" "}
+                <InlineFormula id="formula-product-reflect-w" latex="\clr{w}{w}" colorMap={{ w: "#F7B23B" }} /> and
+                the two answers keep disagreeing. Each number acts on the other as a
                 whole, so splitting them into real and imaginary pieces destroys what
                 multiplication is actually doing.
             </EditableParagraph>
@@ -309,7 +316,9 @@ export const complexProductBlocks: ReactElement[] = [
     <StackLayout key="layout-product-question-square" maxWidth="xl">
         <Block id="product-question-square" padding="md">
             <EditableParagraph id="para-product-question-square" blockId="product-question-square">
-                Two numbers sit on the imaginary axis: 2i and 3i. Their product is{" "}
+                Two numbers sit on the imaginary axis:{" "}
+                <InlineFormula id="formula-product-question-square-z" latex="\clr{z}{2i}" colorMap={{ z: "#62D0AD" }} /> and{" "}
+                <InlineFormula id="formula-product-question-square-w" latex="\clr{w}{3i}" colorMap={{ w: "#F7B23B" }} />. Their product is{" "}
                 <InlineFeedback
                     varName="answer_product_square"
                     correctValue="-6"
@@ -357,7 +366,8 @@ export const complexProductBlocks: ReactElement[] = [
     <StackLayout key="layout-product-question-real" maxWidth="xl">
         <Block id="product-question-real" padding="md">
             <EditableParagraph id="para-product-question-real" blockId="product-question-real">
-                Multiplying 1 + 3i by the plain real number 2 gives{" "}
+                Multiplying <InlineFormula id="formula-product-question-real-z" latex="\clr{z}{1 + 3i}" colorMap={{ z: "#62D0AD" }} /> by
+                the plain real number <InlineFormula id="formula-product-question-real-w" latex="\clr{w}{2}" colorMap={{ w: "#F7B23B" }} /> gives{" "}
                 <InlineFeedback
                     varName="answer_product_real"
                     correctValue={["2+6i", "2 + 6i", "6i+2", "6i + 2"]}
